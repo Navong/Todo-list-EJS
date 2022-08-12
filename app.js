@@ -3,14 +3,19 @@ const bodyParser = require('body-parser');
 
 const app = express();
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(express.static('public'));
 
+let items = ['Work Out', 'Coding', 'Read News'];
+let workLists = [];
 
-var items = ['Work Out', 'Coding', 'Read News'];
+//route
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     const currentDate = new Date();
-    var options ={
+    var options = {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -18,15 +23,41 @@ app.get('/', (req, res)=>{
     };
 
     var date = currentDate.toLocaleDateString('en-US', options);
-    res.render('index',{Date: date, items: items});
+    res.render('index', {
+        ListTitle: date,
+        items: items
+    });
 })
 
-app.post('/', (req,res)=>{
+app.get('/work', (req, res) => {
+    res.render('index', {
+        ListTitle: 'Work',
+        items: workLists
+    });
+})
+
+app.post('/', (req, res) => {
     var item = req.body.text;
-    items.push(item);
-    res.redirect();
+
+    if (req.body.list === 'Work') {
+        workLists.push(item);
+        console.log('Work');
+        res.redirect('/work');
+    } else {
+        console.log('Date');
+        items.push(item);
+        res.redirect('/');
+    }
+    // console.log(req.body);
 })
 
-app.listen(3000, ()=>{
+app.get('/about', (req,res)=>{
+    res.render('about');
+})
+
+
+
+
+app.listen(3000, () => {
     console.log('Server is running on port 3000.');
 })

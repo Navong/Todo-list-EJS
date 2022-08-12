@@ -1,19 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EJS Demo</title>
-</head>
-<body>
-    <h1><%= Date %></h1>
-    <form action="/" method="post">
-        <input type="text" name="text" id="input">
-        <button type="submit">추가</button>
-    </form>
+<%- include('header'); -%>
+
+
+<div class="box" id="heading">
+    <h1><%= ListTitle %></h1>
+</div>
+<div class="box">
     <% for( let i = 0; i < items.length; i++ ) { %>
-        <li><%= items[i] %> </li>
+    <div class="item">
+        <input type="checkbox">
+        <p><%= items[i] %> </p>
+    </div>
     <% } %>
-</body>
-</html>
+    <form action="/" method="post" class="item">
+        <input type="text" name="text" placeholder="New Item">
+        <button type="submit" name="list" value="<%= ListTitle %>">+</button>
+    </form>
+</div>
+
+
+<%- include('footer'); -%>
