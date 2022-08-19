@@ -16,7 +16,8 @@ app.use(express.static('public'));
 
 
 //datebase
-mongoose.connect('mongodb://localhost:27017/todolistDB');
+// mongoose.connect('mongodb://localhost:27017/todolistDB');
+mongoose.connect('mongodb+srv://jumin:navong9248@cluster0.g7p3hrk.mongodb.net/todolistDB?retryWrites=true&w=majority');
 
 const itemsSchema = {
     name: "String"
@@ -60,8 +61,16 @@ app.get('/', (req, res) => {
     })
 })
 
-
-
+app.post('/delete', (req,res)=>{
+    const checkedItemId = req.body.checkbox;
+    // console.log(checkedItemId)
+    Item.findByIdAndRemove(checkedItemId, (err)=>{
+        if(!err){
+            console.log("Deleted.");
+        }
+    })
+    res.redirect('/');
+});
 
 app.get('/work', (req, res) => {
     res.render('index', {
