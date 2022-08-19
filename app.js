@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const date = require(__dirname + '/date.js');
+const mongoose = require('mongoose');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -8,26 +10,58 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static('public'));
 
-let items = ['Work Out', 'Coding', 'Read News'];
-let workLists = [];
+// const items = ['Work Out', 'Coding', 'Read News'];
+// //we can push items into array with const
+// let workLists = [];
+
+
+//datebase
+mongoose.connect('mongodb://localhost:27017/todolistDB');
+
+const itemsSchema = {
+    name: "String"
+}
+
+const Item = mongoose.model("Item", itemsSchema);
+
+const item1 = Item({
+    name: "Welcome to your todolist!"
+})
+const item2 = Item({
+    name: "Hit + button to add new item."
+})
+const item3 = Item({
+    name: "<-- Hit this to delete an item."
+})
+
+const defaultItems = [item1, item2, item3];
+
 
 //route
 
 app.get('/', (req, res) => {
-    const currentDate = new Date();
-    var options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
 
-    var date = currentDate.toLocaleDateString('en-US', options);
-    res.render('index', {
-        ListTitle: date,
-        items: items
-    });
+    Item.find((err, foundItems) => {
+
+        if(foundItems.length === 0){
+            Item.insertMany(defaultItems, (err)=>{
+                if(!err){
+                    console.log("Insert Completed.")
+                }
+            });
+
+            res.redirect('/');
+        }else{
+            res.render('index', {
+                ListTitle: 'Today',
+                items: foundItems
+            });
+        }    
+    })
 })
+
+
+
 
 app.get('/work', (req, res) => {
     res.render('index', {
@@ -37,26 +71,22 @@ app.get('/work', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-    var item = req.body.text;
+    //create a new document
 
-    if (req.body.list === 'Work') {
-        workLists.push(item);
-        console.log('Work');
-        res.redirect('/work');
-    } else {
-        console.log('Date');
-        items.push(item);
-        res.redirect('/');
-    }
-    // console.log(req.body);
+    const newItem = Item({
+        name : req.body.text
+    })
+
+    //save 
+
+    newItem.save();
+
+    res.redirect('/');
 })
 
-app.get('/about', (req,res)=>{
+app.get('/about', (req, res) => {
     res.render('about');
 })
-
-
-
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000.');
